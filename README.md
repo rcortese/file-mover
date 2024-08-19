@@ -21,7 +21,7 @@ This project is a containerized Python script that monitors a specified folder a
 Clone the repository to your local machine:
 
 ```bash
-git clone <repository-url>
+git clone git@github.com:rcortese/file-mover.git
 cd file_mover
 ```
 
@@ -38,11 +38,11 @@ docker build -t file-mover .
 Run the Docker container, replacing `<source_folder>` and `<destination_folder>` with the paths you want to monitor and move files to. Note that these paths need to be accessible from within the container.
 
 ```bash
-docker run -v /path/on/host/source:/source_folder -v /path/on/host/destination:/destination_folder file-mover /source_folder /destination_folder
+docker run
+  -v <source_folder>:/source_folder
+  -v <destination_folder>:/destination_folder
+  file-mover
 ```
-
-- `/path/on/host/source` is the path on your host machine that you want to monitor.
-- `/path/on/host/destination` is the path on your host machine where you want the files to be moved.
 
 ### 4. Verify Operation
 
@@ -67,7 +67,10 @@ docker stop <container-id-or-name>
 To monitor `/data/incoming` and move files to `/data/processed`, run:
 
 ```bash
-docker run -v /data/incoming:/source_folder -v /data/processed:/destination_folder file-mover /source_folder /destination_folder
+docker run
+  -v /data/incoming:/source_folder
+  -v /data/processed:/destination_folder
+  file-mover
 ```
 
 ## Troubleshooting

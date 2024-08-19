@@ -16,24 +16,23 @@ This project is a containerized Python script that monitors a specified folder a
 
 ## Getting Started
 
-### 1. Clone the Repository
+### 1. Pull the Docker Container
 
-Clone the repository to your local machine:
+Pull the latest version of the container to your local machine:
 
 ```bash
-git clone git@github.com:rcortese/file-mover.git
-cd file_mover
+docker pull rcortese/file-mover:latest
 ```
 
 ### 2. Run the Docker Container
 
-Replace `<source_folder>` and `<destination_folder>` in docker-compose.yml file with the paths you want to monitor and move files to. Pull and run the Docker container using docker-compose.
+Replace `<source_folder>` and `<destination_folder>` in docker-compose.yml file with the paths you want to monitor and move files to. Run the Docker container using docker-compose:
 
 ```bash
 docker-compose up -d
 ```
 
-Alternatively, you can run without docker-compose:
+Alternatively, to run without docker-compose, replace `<source_folder>` and `<destination_folder>` with the paths you want to monitor and move files to and run:
 
 ```bash
 docker run -d

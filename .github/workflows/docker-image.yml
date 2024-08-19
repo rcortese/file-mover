@@ -4,9 +4,15 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - '**.md'
+      - 'docker-compose.yml'
   pull_request:
     branches:
       - main
+    paths-ignore:
+      - '**.md'
+      - 'docker-compose.yml'
   workflow_dispatch:
 
 jobs:

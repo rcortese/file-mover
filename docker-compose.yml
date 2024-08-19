@@ -1,0 +1,9 @@
+
+services:
+  file-mover:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - /path/on/host/source:/source_folder
+      - /path/on/host/destination:/destination_folder

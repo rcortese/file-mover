@@ -5,5 +5,5 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - /path/on/host/source:/source_folder
-      - /path/on/host/destination:/destination_folder
+      - <source_folder>:/source_folder
+      - <destination_folder>:/destination_folder

@@ -25,30 +25,28 @@ git clone git@github.com:rcortese/file-mover.git
 cd file_mover
 ```
 
-### 2. Build the Docker Image
+### 2. Run the Docker Container
 
-Build the Docker image using the provided Dockerfile:
+Replace `<source_folder>` and `<destination_folder>` in docker-compose.yml file with the paths you want to monitor and move files to. Pull and run the Docker container using docker-compose.
 
 ```bash
-docker build -t file-mover .
+docker-compose up -d
 ```
 
-### 3. Run the Docker Container
-
-Run the Docker container, replacing `<source_folder>` and `<destination_folder>` with the paths you want to monitor and move files to. Note that these paths need to be accessible from within the container.
+Alternatively, you can run without docker-compose:
 
 ```bash
-docker run
+docker run -d
   -v <source_folder>:/source_folder
   -v <destination_folder>:/destination_folder
-  file-mover
+  rcortese/file-mover:latest
 ```
 
-### 4. Verify Operation
+### 3. Verify Operation
 
 Once the container is running, it will monitor the source folder for new files and move them to the destination folder as they appear.
 
-### 5. Stopping the Container
+### 4. Stopping the Container
 
 To stop the container, use:
 
@@ -67,10 +65,10 @@ docker stop <container-id-or-name>
 To monitor `/data/incoming` and move files to `/data/processed`, run:
 
 ```bash
-docker run
+docker run -d
   -v /data/incoming:/source_folder
   -v /data/processed:/destination_folder
-  file-mover
+  rcortese/file-mover:latest
 ```
 
 ## Troubleshooting

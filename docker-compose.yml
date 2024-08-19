@@ -1,9 +1,7 @@
 
 services:
   file-mover:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: rcortese/file-mover:latest
     volumes:
       - <source_folder>:/source_folder
       - <destination_folder>:/destination_folder

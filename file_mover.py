@@ -15,10 +15,6 @@ class FileMoverHandler(FileSystemEventHandler):
         print(f"Event detected: File created - {event.src_path}")
         self.process(event)
 
-    def on_modified(self, event):
-        print(f"Event detected: File modified - {event.src_path}")
-        self.process(event)
-
     def process(self, event):
         if not event.is_directory:
             dest_path = os.path.join(self.destination_folder, os.path.relpath(event.src_path, self.source_folder))
@@ -59,4 +55,3 @@ if __name__ == "__main__":
         observer.stop()
         print("Stopping observer...")
     observer.join()
-

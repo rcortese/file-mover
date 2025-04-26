@@ -8,6 +8,8 @@ class FileMoverHandler(FileSystemEventHandler):
     def __init__(self, source_folder, destination_folder):
         self.source_folder = source_folder
         self.destination_folder = destination_folder
+        if not os.path.exists(destination_folder):
+            os.makedirs(destination_folder, exist_ok=True)
 
     def on_created(self, event):
         print(f"Event detected: File created - {event.src_path}")
@@ -44,17 +46,17 @@ if __name__ == "__main__":
         source_folder = '/source_folder'
         destination_folder = '/destination_folder'
 
-    if not os.path.exists(destination_folder):
-        os.makedirs(destination_folder, exist_ok=True)
-
     event_handler = FileMoverHandler(source_folder, destination_folder)
+
     observer = Observer()
     observer.schedule(event_handler, path=source_folder, recursive=True)
     observer.start()
+    print(f"Monitoring {source_folder} for changes...")
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
         observer.stop()
+        print("Stopping observer...")
     observer.join()
 

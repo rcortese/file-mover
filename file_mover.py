@@ -1,5 +1,4 @@
 import os
-import logging
 import shutil
 import time
 from watchdog.observers import Observer
@@ -9,12 +8,13 @@ class FileMoverHandler(FileSystemEventHandler):
     def __init__(self, source_folder, destination_folder):
         self.source_folder = source_folder
         self.destination_folder = destination_folder
-        self.logger = logging.getLogger('file_mover')
 
     def on_created(self, event):
+        print(f"Event detected: File created - {event.src_path}")
         self.process(event)
 
     def on_modified(self, event):
+        print(f"Event detected: File modified - {event.src_path}")
         self.process(event)
 
     def process(self, event):
@@ -22,6 +22,7 @@ class FileMoverHandler(FileSystemEventHandler):
             dest_path = os.path.join(self.destination_folder, os.path.relpath(event.src_path, self.source_folder))
             dest_folder = os.path.dirname(dest_path)
             if not os.path.exists(dest_folder):
+                print(f"Creating destination folder: {dest_folder}")
                 os.makedirs(dest_folder)
             if os.path.exists(dest_path):
                 file_name, file_extension = os.path.splitext(dest_path)
@@ -29,7 +30,7 @@ class FileMoverHandler(FileSystemEventHandler):
                 while os.path.exists('{}_{}{}'.format(file_name, i, file_extension)):
                     i += 1
                 dest_path = '{}_{}{}'.format(file_name, i, file_extension)
-            self.logger.info('Moving {} to {}'.format(event.src_path, dest_path))
+            print(f"Moving file from {event.src_path} to {dest_path}")
             shutil.move(event.src_path, dest_path)
 
 if __name__ == "__main__":
@@ -45,8 +46,6 @@ if __name__ == "__main__":
 
     if not os.path.exists(destination_folder):
         os.makedirs(destination_folder, exist_ok=True)
-
-    logging.basicConfig(filename='file_mover.log', level=logging.INFO)
 
     event_handler = FileMoverHandler(source_folder, destination_folder)
     observer = Observer()

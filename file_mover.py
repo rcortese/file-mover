@@ -21,7 +21,7 @@ class FileMoverHandler(FileSystemEventHandler):
             dest_folder = os.path.dirname(dest_path)
             if not os.path.exists(dest_folder):
                 print(f"Creating destination folder: {dest_folder}")
-                os.makedirs(dest_folder)
+                os.makedirs(dest_folder, exist_ok=True)
             if os.path.exists(dest_path):
                 file_name, file_extension = os.path.splitext(dest_path)
                 i = 1

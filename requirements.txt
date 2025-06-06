@@ -1,1 +1,4 @@
 watchdog
+
+# dev dependencies
+pytest

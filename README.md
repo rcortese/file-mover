@@ -35,9 +35,9 @@ docker-compose up -d
 Alternatively, to run without docker-compose, replace `<source_folder>` and `<destination_folder>` with the paths you want to monitor and move files to and run:
 
 ```bash
-docker run -d
-  -v <source_folder>:/source_folder
-  -v <destination_folder>:/destination_folder
+docker run -d \
+  -v <source_folder>:/source_folder \
+  -v <destination_folder>:/destination_folder \
   rcortese/file-mover:latest
 ```
 
@@ -64,9 +64,9 @@ docker stop <container-id-or-name>
 To monitor `/data/incoming` and move files to `/data/processed`, run:
 
 ```bash
-docker run -d
-  -v /data/incoming:/source_folder
-  -v /data/processed:/destination_folder
+docker run -d \
+  -v /data/incoming:/source_folder \
+  -v /data/processed:/destination_folder \
   rcortese/file-mover:latest
 ```
 

@@ -1,16 +1,15 @@
 import os
 import shutil
-import time
 import logging
 
 try:
     from watchdog.observers import Observer
     from watchdog.events import FileSystemEventHandler
 except ImportError:  # pragma: no cover - fallback for environments without watchdog
-    class FileSystemEventHandler:
+    class FileSystemEventHandler:  # type: ignore
         pass
 
-    class Observer:
+    class Observer:  # type: ignore
         def schedule(self, *_, **__):
             pass
 
@@ -23,8 +22,9 @@ except ImportError:  # pragma: no cover - fallback for environments without watc
         def join(self):
             pass
 
+
 class FileMoverHandler(FileSystemEventHandler):
-    def __init__(self, source_folder, destination_folder):
+    def __init__(self, source_folder: str, destination_folder: str) -> None:
         self.source_folder = source_folder
         self.destination_folder = destination_folder
         if not os.path.exists(destination_folder):
@@ -36,7 +36,7 @@ class FileMoverHandler(FileSystemEventHandler):
         )
         self.move_existing_files()
 
-    def move_file(self, src_path):
+    def move_file(self, src_path: str) -> None:
         dest_path = os.path.join(
             self.destination_folder, os.path.relpath(src_path, self.source_folder)
         )
@@ -53,53 +53,18 @@ class FileMoverHandler(FileSystemEventHandler):
         try:
             shutil.move(src_path, dest_path)
             logging.info("Moved file from %s to %s", src_path, dest_path)
-        except Exception as exc:
+        except Exception as exc:  # pragma: no cover - safety net
             logging.error("Failed to move %s to %s: %s", src_path, dest_path, exc)
 
-    def move_existing_files(self):
+    def move_existing_files(self) -> None:
         for root, _, files in os.walk(self.source_folder):
             for name in list(files):
                 self.move_file(os.path.join(root, name))
 
-    def on_created(self, event):
+    def on_created(self, event) -> None:
         logging.info("Event detected: File created - %s", event.src_path)
         self.process(event)
 
-    def process(self, event):
-        if not event.is_directory:
+    def process(self, event) -> None:
+        if not getattr(event, "is_directory", False):
             self.move_file(event.src_path)
-
-if __name__ == "__main__":
-    import sys
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-    )
-
-    if os.environ.get("SOURCE_FOLDER"):
-        source_folder = os.environ["SOURCE_FOLDER"]
-    elif len(sys.argv) > 1:
-        source_folder = sys.argv[1]
-    else:
-        source_folder = "/source_folder"
-
-    if os.environ.get("DEST_FOLDER"):
-        destination_folder = os.environ["DEST_FOLDER"]
-    elif len(sys.argv) > 2:
-        destination_folder = sys.argv[2]
-    else:
-        destination_folder = "/destination_folder"
-
-    event_handler = FileMoverHandler(source_folder, destination_folder)
-
-    observer = Observer()
-    observer.schedule(event_handler, path=source_folder, recursive=True)
-    observer.start()
-    logging.info("Monitoring %s for changes...", source_folder)
-    try:
-        while True:
-            time.sleep(1)
-    except KeyboardInterrupt:
-        observer.stop()
-        logging.info("Stopping observer...")
-    observer.join()

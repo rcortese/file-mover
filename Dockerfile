@@ -9,10 +9,10 @@ COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code to the container
-COPY file_mover.py ./
+COPY file_mover ./file_mover
 
 # Set the entry point for the container
-ENTRYPOINT ["python", "file_mover.py"]
+ENTRYPOINT ["python", "-m", "file_mover"]
 
 # Default command to run the script for source and destination folders
 CMD ["/source_folder", "/destination_folder"]

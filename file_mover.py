@@ -13,23 +13,32 @@ class FileMoverHandler(FileSystemEventHandler):
 
     def on_created(self, event):
         print(f"Event detected: File created - {event.src_path}")
-        self.process(event)
+        self.process(event.src_path, event.is_directory)
 
-    def process(self, event):
-        if not event.is_directory:
-            dest_path = os.path.join(self.destination_folder, os.path.relpath(event.src_path, self.source_folder))
+    def on_moved(self, event):
+        print(f"Event detected: File moved - {event.dest_path}")
+        # Only handle moves into the monitored folder
+        if event.dest_path.startswith(self.source_folder):
+            self.process(event.dest_path, event.is_directory)
+
+    def process(self, path, is_directory):
+        if not is_directory:
+            dest_path = os.path.join(
+                self.destination_folder,
+                os.path.relpath(path, self.source_folder),
+            )
             dest_folder = os.path.dirname(dest_path)
             if not os.path.exists(dest_folder):
                 print(f"Creating destination folder: {dest_folder}")
-                os.makedirs(dest_folder)
+                os.makedirs(dest_folder, exist_ok=True)
             if os.path.exists(dest_path):
                 file_name, file_extension = os.path.splitext(dest_path)
                 i = 1
-                while os.path.exists('{}_{}{}'.format(file_name, i, file_extension)):
+                while os.path.exists("{}_{}{}".format(file_name, i, file_extension)):
                     i += 1
-                dest_path = '{}_{}{}'.format(file_name, i, file_extension)
-            print(f"Moving file from {event.src_path} to {dest_path}")
-            shutil.move(event.src_path, dest_path)
+                dest_path = "{}_{}{}".format(file_name, i, file_extension)
+            print(f"Moving file from {path} to {dest_path}")
+            shutil.move(path, dest_path)
 
 if __name__ == "__main__":
     import sys

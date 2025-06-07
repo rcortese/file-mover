@@ -53,3 +53,20 @@ def test_process_renames_existing_file(tmp_path):
     assert original_path.exists()
     assert renamed_path.exists()
     assert renamed_path.read_text() == 'new'
+
+
+def test_existing_files_moved_on_init(tmp_path):
+    src = tmp_path / 'src'
+    dest = tmp_path / 'dest'
+    src.mkdir()
+    dest.mkdir()
+
+    existing = src / 'old.txt'
+    existing.write_text('data')
+
+    FileMoverHandler(str(src), str(dest))
+
+    assert not existing.exists()
+    moved = dest / 'old.txt'
+    assert moved.exists()
+    assert moved.read_text() == 'data'

@@ -1,11 +1,12 @@
 # File Mover
 
-This project is a containerized Python script that monitors a specified folder and its subfolders for new files. When new files are detected, they are moved to a destination folder while preserving the original directory structure.
+This project is a containerized Python script that monitors a specified folder and its subfolders for files. Existing files are moved when the program starts, and any new files detected afterward are moved to a destination folder while preserving the original directory structure.
 
 ## Features
 
 - Monitors a folder and its subfolders for new files.
 - Moves newly created files to a destination folder.
+- Moves existing files on startup.
 - Preserves the directory structure during the move.
 - Dockerized application only has access to mapped folders.
 

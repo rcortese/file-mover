@@ -1,6 +1,7 @@
 import os
 import shutil
 import time
+import logging
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -10,48 +11,72 @@ class FileMoverHandler(FileSystemEventHandler):
         self.destination_folder = destination_folder
         if not os.path.exists(destination_folder):
             os.makedirs(destination_folder, exist_ok=True)
+        logging.info(
+            "Initialized handler: %s -> %s",
+            self.source_folder,
+            self.destination_folder,
+        )
 
     def on_created(self, event):
-        print(f"Event detected: File created - {event.src_path}")
+        logging.info("Event detected: File created - %s", event.src_path)
         self.process(event)
 
     def process(self, event):
         if not event.is_directory:
-            dest_path = os.path.join(self.destination_folder, os.path.relpath(event.src_path, self.source_folder))
+            dest_path = os.path.join(
+                self.destination_folder, os.path.relpath(event.src_path, self.source_folder)
+            )
             dest_folder = os.path.dirname(dest_path)
             if not os.path.exists(dest_folder):
-                print(f"Creating destination folder: {dest_folder}")
+                logging.info("Creating destination folder: %s", dest_folder)
                 os.makedirs(dest_folder, exist_ok=True)
             if os.path.exists(dest_path):
                 file_name, file_extension = os.path.splitext(dest_path)
                 i = 1
-                while os.path.exists('{}_{}{}'.format(file_name, i, file_extension)):
+                while os.path.exists(f"{file_name}_{i}{file_extension}"):
                     i += 1
-                dest_path = '{}_{}{}'.format(file_name, i, file_extension)
-            print(f"Moving file from {event.src_path} to {dest_path}")
-            shutil.move(event.src_path, dest_path)
+                dest_path = f"{file_name}_{i}{file_extension}"
+            try:
+                shutil.move(event.src_path, dest_path)
+                logging.info(
+                    "Moved file from %s to %s", event.src_path, dest_path
+                )
+            except Exception as exc:
+                logging.error(
+                    "Failed to move %s to %s: %s", event.src_path, dest_path, exc
+                )
 
 if __name__ == "__main__":
     import sys
-    # source_folder and destination_folder are set to /source_folder and /destination_folder
-    # when no arguments are provided
-    if len(sys.argv) > 2:
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+    )
+
+    if os.environ.get("SOURCE_FOLDER"):
+        source_folder = os.environ["SOURCE_FOLDER"]
+    elif len(sys.argv) > 1:
         source_folder = sys.argv[1]
+    else:
+        source_folder = "/source_folder"
+
+    if os.environ.get("DEST_FOLDER"):
+        destination_folder = os.environ["DEST_FOLDER"]
+    elif len(sys.argv) > 2:
         destination_folder = sys.argv[2]
     else:
-        source_folder = '/source_folder'
-        destination_folder = '/destination_folder'
+        destination_folder = "/destination_folder"
 
     event_handler = FileMoverHandler(source_folder, destination_folder)
 
     observer = Observer()
     observer.schedule(event_handler, path=source_folder, recursive=True)
     observer.start()
-    print(f"Monitoring {source_folder} for changes...")
+    logging.info("Monitoring %s for changes...", source_folder)
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
         observer.stop()
-        print("Stopping observer...")
+        logging.info("Stopping observer...")
     observer.join()

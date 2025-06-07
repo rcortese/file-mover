@@ -58,6 +58,7 @@ docker stop <container-id-or-name>
 
 - **Source Folder**: The directory to be monitored for new files.
 - **Destination Folder**: The directory where files will be moved, preserving the directory structure.
+- The script also respects the `SOURCE_FOLDER` and `DEST_FOLDER` environment variables. If set, these values override command-line arguments and defaults.
 
 ## Example
 
@@ -79,6 +80,7 @@ docker run -d \
   ```bash
   docker logs <container-id-or-name>
   ```
+- The application uses Python logging to report actions and errors.
 
 - **No files are being moved:** Ensure the `source_folder` and `destination_folder` paths are correctly set and that the container has appropriate permissions to access these directories.
 - **Errors during build:** Verify that Docker and Docker Compose are correctly installed and up to date.

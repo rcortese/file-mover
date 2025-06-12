@@ -7,3 +7,8 @@ services:
       DEST_SMB: //server/share
       SMB_USERNAME: user
       SMB_PASSWORD: pass
+    # Allow the container to mount the SMB share
+    cap_add:
+      - SYS_ADMIN
+    security_opt:
+      - apparmor:unconfined

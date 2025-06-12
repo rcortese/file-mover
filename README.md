@@ -84,7 +84,8 @@ docker run -d \
 The `examples/docker-compose-smb.yml` file demonstrates how to configure the
 container when the destination is an SMB share. It sets the required
 environment variables so the share is mounted at `/destination_folder` inside
-the container. Start it with:
+the container. Mounting the share requires the container to run with the
+`SYS_ADMIN` capability (see the compose file for an example). Start it with:
 
 ```bash
 docker compose -f examples/docker-compose-smb.yml up -d
@@ -100,6 +101,10 @@ docker compose -f examples/docker-compose-smb.yml up -d
   docker logs <container-id-or-name>
   ```
 - The application uses Python logging to report actions and errors.
+
+- **SMB mount fails with `Unable to apply new capability set`:** The container
+  needs additional privileges to run `mount.cifs`. Start it with
+  `--cap-add SYS_ADMIN` (or `privileged: true` in Compose).
 
 - **No files are being moved:** Ensure the `source_folder` and `destination_folder` paths are correctly set and that the container has appropriate permissions to access these directories.
 - **Errors during build:** Verify that Docker and Docker Compose are correctly installed and up to date.

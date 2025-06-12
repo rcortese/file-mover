@@ -1,0 +1,9 @@
+services:
+  file-mover:
+    image: rcortese/file-mover:latest
+    volumes:
+      - /local/path:/source_folder
+    environment:
+      DEST_SMB: //server/share
+      SMB_USERNAME: user
+      SMB_PASSWORD: pass

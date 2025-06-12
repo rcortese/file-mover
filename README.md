@@ -27,7 +27,9 @@ docker pull rcortese/file-mover:latest
 
 ### 2. Run the Docker Container
 
-Replace `<source_folder>` and `<destination_folder>` in docker-compose.yml file with the paths you want to monitor and move files to. Run the Docker container using docker-compose:
+The repository includes a minimal `docker-compose.yml` which can be used as a
+template. Replace `<source_folder>` and `<destination_folder>` in that file with
+the paths you want to monitor and move files to, then run:
 
 ```bash
 docker-compose up -d
@@ -60,10 +62,11 @@ docker stop <container-id-or-name>
 - **Source Folder**: The directory to be monitored for new files.
 - **Destination Folder**: The directory where files will be moved, preserving the directory structure.
 - The script also respects the `SOURCE_FOLDER` and `DEST_FOLDER` environment variables. If set, these values override command-line arguments and defaults.
-- To use an SMB share directly, set `DEST_SMB` to the share path (e.g. `//server/share`).
-  Optional `SMB_USERNAME` and `SMB_PASSWORD` variables can provide credentials.
-  The application mounts the share at `/destination_folder` and will attempt to
-  reconnect automatically if the mount is lost.
+- To use an SMB share directly, set `DEST_SMB` to the share path (for example
+  `//server/share`). Optional `SMB_USERNAME` and `SMB_PASSWORD` variables can be
+  supplied for authentication. The application mounts the share inside the
+  container at `/destination_folder` and will automatically attempt to
+  reconnect if the mount is lost.
 
 ## Example
 
@@ -74,6 +77,17 @@ docker run -d \
   -v /data/incoming:/source_folder \
   -v /data/processed:/destination_folder \
   rcortese/file-mover:latest
+```
+
+### Example using an SMB share
+
+The `examples/docker-compose-smb.yml` file demonstrates how to configure the
+container when the destination is an SMB share. It sets the required
+environment variables so the share is mounted at `/destination_folder` inside
+the container. Start it with:
+
+```bash
+docker compose -f examples/docker-compose-smb.yml up -d
 ```
 
 ## Troubleshooting

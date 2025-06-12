@@ -27,12 +27,12 @@ docker pull rcortese/file-mover:latest
 
 ### 2. Run the Docker Container
 
-The repository includes a minimal `docker-compose.yml` which can be used as a
-template. Replace `<source_folder>` and `<destination_folder>` in that file with
-the paths you want to monitor and move files to, then run:
+The repository includes a minimal `examples/docker-compose.yml` file which can
+be used as a template. Replace `<source_folder>` and `<destination_folder>` in
+that file with the paths you want to monitor and move files to, then run:
 
 ```bash
-docker-compose up -d
+docker-compose -f examples/docker-compose.yml up -d
 ```
 
 Alternatively, to run without docker-compose, replace `<source_folder>` and `<destination_folder>` with the paths you want to monitor and move files to and run:

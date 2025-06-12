@@ -6,13 +6,13 @@ on:
       - main
     paths-ignore:
       - '**.md'
-      - 'docker-compose.yml'
+      - 'examples/**'
   pull_request:
     branches:
       - main
     paths-ignore:
       - '**.md'
-      - 'docker-compose.yml'
+      - 'examples/**'
   workflow_dispatch:
 
 jobs:

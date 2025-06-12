@@ -60,6 +60,10 @@ docker stop <container-id-or-name>
 - **Source Folder**: The directory to be monitored for new files.
 - **Destination Folder**: The directory where files will be moved, preserving the directory structure.
 - The script also respects the `SOURCE_FOLDER` and `DEST_FOLDER` environment variables. If set, these values override command-line arguments and defaults.
+- To use an SMB share directly, set `DEST_SMB` to the share path (e.g. `//server/share`).
+  Optional `SMB_USERNAME` and `SMB_PASSWORD` variables can provide credentials.
+  The application mounts the share at `/destination_folder` and will attempt to
+  reconnect automatically if the mount is lost.
 
 ## Example
 

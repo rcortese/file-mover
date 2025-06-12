@@ -4,6 +4,7 @@ import sys
 import time
 
 from .handler import FileMoverHandler, Observer
+from .smb_utils import start_smb_monitor
 
 def main() -> None:
     logging.basicConfig(
@@ -24,6 +25,15 @@ def main() -> None:
         destination_folder = sys.argv[2]
     else:
         destination_folder = "/destination_folder"
+
+    smb_share = os.environ.get("DEST_SMB")
+    if smb_share:
+        start_smb_monitor(
+            smb_share,
+            destination_folder,
+            os.environ.get("SMB_USERNAME"),
+            os.environ.get("SMB_PASSWORD"),
+        )
 
     event_handler = FileMoverHandler(source_folder, destination_folder)
 

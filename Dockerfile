@@ -6,7 +6,10 @@ WORKDIR /usr/src/app
 
 # Copy the requirements file and install dependencies
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends cifs-utils \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code to the container
 COPY file_mover ./file_mover

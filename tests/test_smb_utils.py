@@ -1,3 +1,4 @@
+import logging
 import pytest
 from file_mover import smb_utils
 
@@ -63,3 +64,50 @@ def test_start_smb_monitor_starts_thread(monkeypatch, tmp_path):
 
     assert called.get("ensure")
     assert called["target"] == smb_utils._monitor
+
+
+def test_ensure_mounted_logs_error_on_failure(monkeypatch, caplog, tmp_path):
+    monkeypatch.setattr(smb_utils.os.path, "ismount", lambda p: False)
+    monkeypatch.setattr(smb_utils.os, "makedirs", lambda *a, **k: None)
+    def fail_mount(*a, **k):
+        raise RuntimeError("fail")
+
+    monkeypatch.setattr(smb_utils, "_mount", fail_mount)
+
+    with caplog.at_level(logging.ERROR):
+        smb_utils.ensure_mounted("//share", str(tmp_path))
+
+    assert "Failed to mount SMB share" in caplog.text
+
+
+def test_monitor_logs_error_on_remount_failure(monkeypatch, caplog):
+    monkeypatch.setattr(smb_utils.os.path, "ismount", lambda p: False)
+    def fail_mount(*a, **k):
+        raise RuntimeError("fail")
+
+    monkeypatch.setattr(smb_utils, "_mount", fail_mount)
+    def stop_sleep(_):
+        raise StopIteration
+
+    monkeypatch.setattr(smb_utils.time, "sleep", stop_sleep)
+
+    with caplog.at_level(logging.ERROR), pytest.raises(StopIteration):
+        smb_utils._monitor("//share", "/mnt", interval=0)
+
+    assert "Remount failed" in caplog.text
+
+
+def test_ensure_mounted_passes_credentials(monkeypatch, tmp_path):
+    details = {}
+    monkeypatch.setattr(smb_utils.os.path, "ismount", lambda p: False)
+    monkeypatch.setattr(smb_utils.os, "makedirs", lambda *a, **k: None)
+
+    def fake_mount(share, mount_point, username=None, password=None):
+        details["user"] = username
+        details["pass"] = password
+
+    monkeypatch.setattr(smb_utils, "_mount", fake_mount)
+
+    smb_utils.ensure_mounted("//share", str(tmp_path), "u", "p")
+
+    assert details == {"user": "u", "pass": "p"}

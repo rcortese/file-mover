@@ -34,6 +34,12 @@ def main() -> None:
     try:
         while True:
             time.sleep(1)
+            if not observer.is_alive():
+                logging.error(
+                    "Observer thread died unexpectedly, exiting for restart..."
+                )
+                observer.stop()
+                sys.exit(1)
     except KeyboardInterrupt:
         observer.stop()
         logging.info("Stopping observer...")

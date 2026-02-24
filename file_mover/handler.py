@@ -10,14 +10,20 @@ except ImportError:  # pragma: no cover - fallback for environments without watc
         pass
 
     class Observer:  # type: ignore
+        def __init__(self):
+            self._alive = False
+
         def schedule(self, *_, **__):
             pass
 
         def start(self):
-            pass
+            self._alive = True
 
         def stop(self):
-            pass
+            self._alive = False
+
+        def is_alive(self):
+            return self._alive
 
         def join(self):
             pass

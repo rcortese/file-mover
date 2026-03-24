@@ -60,6 +60,34 @@ docker stop <container-id-or-name>
 - **Source Folder**: The directory to be monitored for new files.
 - **Destination Folder**: The directory where files will be moved, preserving the directory structure.
 - The script also respects the `SOURCE_FOLDER` and `DEST_FOLDER` environment variables. If set, these values override command-line arguments and defaults.
+- Optional destination validation can be enabled with:
+  - `DEST_REQUIRE_MOUNT=true` to require `/destination_folder` itself to be a mountpoint
+  - `DEST_EXPECTED_FSTYPE=cifs` to require a specific filesystem type
+  - `DEST_EXPECTED_SOURCE=//media.lan/home-assistant` to require a specific mount source
+
+### SMB/CIFS Safety Mode
+
+By default, `file-mover` keeps its current simple behavior and works with ordinary local folders.
+
+If your destination is supposed to be an SMB/CIFS mount, enable destination validation so the container fails fast instead of silently writing to the wrong local path:
+
+```bash
+docker run -d \
+  -e DEST_REQUIRE_MOUNT=true \
+  -e DEST_EXPECTED_FSTYPE=cifs \
+  -e DEST_EXPECTED_SOURCE=//media.lan/home-assistant \
+  -v /data/incoming:/source_folder \
+  -v /mnt/media_home_assistant:/destination_folder \
+  rcortese/file-mover:latest
+```
+
+When validation is enabled, the container exits with a non-zero status and logs a stable error marker such as:
+
+- `DEST_MOUNT_INVALID`
+- `DEST_FSTYPE_MISMATCH`
+- `DEST_SOURCE_MISMATCH`
+
+The image also includes a Docker healthcheck that reuses the same validation logic. If you do not set any of the validation variables, the healthcheck remains effectively passive and local-folder setups keep working unchanged.
 
 ## Example
 
@@ -84,6 +112,7 @@ docker run -d \
 - The application uses Python logging to report actions and errors.
 
 - **No files are being moved:** Ensure the `source_folder` and `destination_folder` paths are correctly set and that the container has appropriate permissions to access these directories.
+- **Files appear to move, but the destination SMB was down:** enable `DEST_REQUIRE_MOUNT` and `DEST_EXPECTED_FSTYPE=cifs` so the container fails fast instead of writing to an unintended local directory.
 - **Errors during build:** Verify that Docker and Docker Compose are correctly installed and up to date.
 
 ## License

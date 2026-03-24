@@ -11,6 +11,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application code to the container
 COPY file_mover ./file_mover
 
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD ["python", "-m", "file_mover", "--validate-destination"]
+
 # Set the entry point for the container
 ENTRYPOINT ["python", "-m", "file_mover"]
 

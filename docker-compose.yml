@@ -5,3 +5,8 @@ services:
     volumes:
       - <source_folder>:/source_folder
       - <destination_folder>:/destination_folder
+    environment:
+      # Optional SMB/CIFS safety checks. Leave unset for simple local-folder usage.
+      # DEST_REQUIRE_MOUNT: "true"
+      # DEST_EXPECTED_FSTYPE: cifs
+      # DEST_EXPECTED_SOURCE: //media.lan/home-assistant
